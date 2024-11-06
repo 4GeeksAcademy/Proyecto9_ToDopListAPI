@@ -2,96 +2,93 @@ import React, { useEffect, useState } from "react";
 
 
 
-// // FUNCION PARA CREAR UN USUARIO//POST(SI ESPERA BODY)
-// async function nuevoCliente() {
-//     try {
-//         const res = await fetch('', {
-//             method: "POST",
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ name: '' })
-//         });
-//         const data = await res.json();
-//         console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.log('Error al crear nuevo usuario', error);
-//     }
-// }
+// FUNCION PARA CREAR UN USUARIO//POST(SI ESPERA BODY)
+async function nuevaTarea() {
+    try {
+        const res = await fetch('https://playground.4geeks.com/todo/users/AlexTodoList', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: 'AlexTodoList' })
+        });
+        const data = await res.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log('Error al crear nuevo usuario', error);
+    }
+}
 
 
-// // FUNCION PARA ELIMINAR UN USUARIO//DELETE(NO ESPERA BODY)
-
-// async function eliminarCliente() {
-//     try {
-//         const res = await fetch('', {
-//             method: "DELETE"
-//         });
-//         const data = await res.json();
-//         console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.log('Error al eliminar cliente', error);
-//     }
-// }
+// FUNCION PARA ELIMINAR UN USUARIO//DELETE(NO ESPERA BODY)
+async function eliminarTareaAPI(id) {
+    try {
+        await fetch(`https://playground.4geeks.com/todo/todos/${id}`, { method: "DELETE" });
+        console.log("Tarea eliminada de la API");
+    } catch (error) {
+        console.log("Error al eliminar tarea de la API", error);
+    }
+}
 
 
-// // FUNCION PARA LEER UN USUARIO
-// async function leerCliente() {
-//     try {
-//         const resultado = await fetch('');
-//         const data = await resultado.json();
-//         console.log(data);
-//         return data;
-//     } catch (error) {
-//         console.log('Error', error);
-//         return null;
-//     }
-// }
+// FUNCION PARA LEER UN USUARIO
+async function leerTarea() {
+    try {
+        const resultado = await fetch('https://playground.4geeks.com/todo/users/AlexTodoList');
+        const data = await resultado.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log('Error', error);
+        return null;
+    }
+}
+
+
+
+
 
 
 
 // COMPONENTE 
 const List = () => {
-    const [inputValue, setInputValue] = useState("");
-    const [todoList, setTodoList] = useState([]);
-
-
-    const [estado, setEstado] = useState(false);
+    const [inputValue, setInputValue] = useState(""); // Valor del input
+    const [todoList, setTodoList] = useState([]);   // Lista de tareas
+    const [estado, setEstado] = useState(false);     // Estado de los elementos (si se está pasando el mouse encima)
+    
+    
     const numTareas = todoList.length;
+
+
+    // FUNCIONES PARA QUE APAREZCA O NO EL ELEMENTO
+    function mauseEncimaElemento(index) {
+        setEstado(index); // Muestra el botón de eliminar al pasar el mouse sobre un elemento
+    }
+
+    function mauseFueraElemento() {
+        setEstado(false); // Oculta el botón de eliminar cuando el mouse sale del elemento
+    }
+
+
+
+
+    async function eliminarTareaLocal(index) {
+        const item = todoList[index];
+        await eliminarTareaAPI(item.id);  // Eliminar tarea desde la API
+        const resultado = todoList.filter((_, i) => i !== index);  // Eliminar de la lista local
+        setTodoList(resultado);  // Actualizar la lista local
+        console.log("Tarea eliminada");
+    }
+
 
 
     // FUNCION ASINCRONA CREAR NUEVA TAREA 
     async function onSubmit(e) {
         e.preventDefault();
-        await creartodoList(inputValue);
-        setInputValue('');
+        await creartodoList(inputValue); // Crea nueva tarea
+         setInputValue(''); // Limpiar el input
         console.log("onSubmit");
-    };
-
-
-
-
-    // FUNCIONES PARA QUE APAREZCA O NO EL ELEMENTO
-    function mauseEncimaElemento(index) {
-        setEstado(index);
-    }
-
-    function mauseFueraElemento() {
-        setEstado(false);
-    }
-
-
-
-
-
-    async function eliminarTarea(index) {
-        const item = todoList[index];
-        await eliminarCliente(item.id);
-        const resultado = todoList.filter((_, i) => i !== index);
-        todoList(resultado);
-        console.log("onDelete");
     };
 
 
@@ -101,75 +98,73 @@ const List = () => {
 
     async function creartodoList(item) {
         try {
-            const res = await fetch('', {
+            const res = await fetch('https://playground.4geeks.com/todo/todos', {  // URL correcta para tareas
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    "label": item,
-                    "value": false
+                    "label": item,  // Texto de la tarea
+                    "value": false   // Estado de la tarea 
                 })
             });
+
             const data = await res.json();
-            const nuevaLista = [...todoList, { id: data.id, label: item }];
-            setTodoList(nuevaLista);
+            const nuevaLista = [...todoList, { id: data.id, label: item }]; // Añade la nueva tarea a la lista
+            setTodoList(nuevaLista);  // Actualiza el estado con la nueva lista
             console.log(data);
         } catch (error) {
             console.log('Error al crear TodoList', error);
         }
     }
 
-    async function eliminarTodoList(id) {
-        try {
-            const res = await fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
-                method: 'DELETE'
-            });
-            if (!res.ok) {
-                throw new Error('Error al eliminar el TodoList');
-            }
-            await leerCliente();
-        } catch (error) {
-            console.log('Error ==> ', error);
-        }
-    }
+
+
+
+
+    // Eliminar todas las tareas de la lista local
     async function limpiarTodoList() {
         for (const item of todoList) {
-            await eliminarTodoList(item.id);
+            await eliminarTareaAPI(item.id);  // Eliminar tarea en la API
         }
-        setTodoList([]);
-        eliminarCliente();
+        setTodoList([]);  // Limpiar la lista local
     }
 
+
+
+    // Eliminar todas las tareas de la lista
+    async function limpiarTodoList() {
+        for (const item of todoList) {
+            await eliminarTareaLocal(item.id);  // Eliminar tarea de la API
+        }
+        setTodoList([]);  // Limpiar la lista local
+    }
+
+
+
+
+
+    // Función para obtener datos y manejar la creación del usuario
     async function fetchData() {
-        const data = await leerCliente();
+        const data = await leerTarea();  // Leer datos desde la API
         console.log(data);
-        if (data && Array.isArray(data.todos)) {
-            setTodoList(data.todos);
+        if (data && data.todos && Array.isArray(data.todos)) {
+            setTodoList(data.todos);  // Si existe la propiedad 'todos' y es un arreglo, actualizar la lista
         } else {
-            await nuevoCliente();
-            const nuevaLista = await leerCliente();
-            setTodoList(nuevaLista.todos);
+            await nuevaTarea();  // Si no existe el usuario, crearlo
+            const nuevaLista = await leerTarea();  // Leer las tareas de nuevo
+            if (nuevaLista && nuevaLista.todos) {
+                setTodoList(nuevaLista.todos);  // Establecer las tareas
+            } else {
+                setTodoList([]);  // Si no hay tareas, establecer lista vacía
+            }
         }
     }
+
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        fetchData();  // Llamar a fetchData al montar el componente
+    }, []);  // Dependencias vacías para que solo se ejecute una vez
 
 
 
@@ -185,12 +180,25 @@ const List = () => {
                     <div className="container-flex border-bottom p-1">
                         <input
                             onChange={(e) =>
-                                setInputValue(e.target.value)} value={inputValue}
+                                setInputValue(e.target.value)} 
+                            value={inputValue}
+                            required
                             type="text"
                             onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    setTodoList(todoList.concat(inputValue));
-                                    setInputValue("");
+                                if (e.key === "Enter" && inputValue.trim() !== "") {
+                                    // Verificar si la tarea ya existe en la lista
+                                    // if (!todoList.some(task => task.label.toLowerCase() === inputValue.toLowerCase())) {
+                                    //     setTodoList(todoList.concat({ label: inputValue, value: false }));
+                                    //     setInputValue("");  // Limpiar el input
+                                    const newValue = inputValue.trim()
+
+                                    if (inputValue && newValue != "") {
+                                         creartodoList(inputValue) 
+
+                                    
+                                    } else {
+                                        alert("¡Esta tarea ya existe!");
+                                    }
                                 }
                             }}
                             placeholder="Escribe una tarea a realizar">
@@ -212,7 +220,7 @@ const List = () => {
                                 {item.label}
                                 {estado === index && (
                                     <button
-                                        className="btn" onClick={() => eliminarTarea(index)}>
+                                        className="btn" onClick={() => eliminarTareaLocal(index)}>
                                         <svg
                                             className="clear"
                                             xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
