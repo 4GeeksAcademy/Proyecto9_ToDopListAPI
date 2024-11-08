@@ -56,8 +56,7 @@ const List = () => {
     const [inputValue, setInputValue] = useState(""); // Valor del input
     const [todoList, setTodoList] = useState([]);   // Lista de tareas
     const [estado, setEstado] = useState(false);     // Estado de los elementos (si se está pasando el mouse encima)
-    
-    
+
     const numTareas = todoList.length;
 
 
@@ -71,15 +70,43 @@ const List = () => {
     }
 
 
-
-
     async function eliminarTareaLocal(index) {
-        const item = todoList[index];
-        await eliminarTareaAPI(item.id);  // Eliminar tarea desde la API
-        const resultado = todoList.filter((_, i) => i !== index);  // Eliminar de la lista local
-        setTodoList(resultado);  // Actualizar la lista local
-        console.log("Tarea eliminada");
+        // for ([expresion-inicial]; [condicion]; [expresion-final])sentencia
+
+        for (let i = 0; i < todoList.length; i++) {
+
+            if (i === index) {
+                const item = todoList[i];
+                console.log(item);
+                await eliminarTareaAPI(item.id);
+                const resultado = todoList.filter((_, i) => i !== index);
+                setTodoList(resultado);
+                console.log("Tarea eliminada");
+                break;
+            }
+        }
     }
+
+    async function eliminarTodas() {
+        // for ([expresion-inicial]; [condicion]; [expresion-final])sentencia
+
+        for (let i = 0; i < todoList.length; i++) {
+            const item = todoList[i];
+            console.log(item);
+             eliminarTareaAPI(item.id);
+
+
+
+        }
+        setTodoList([]);  // Actualizar la lista local
+        leerTarea()
+
+    }
+
+
+
+
+
 
 
 
@@ -87,7 +114,7 @@ const List = () => {
     async function onSubmit(e) {
         e.preventDefault();
         await creartodoList(inputValue); // Crea nueva tarea
-         setInputValue(''); // Limpiar el input
+        setInputValue(''); // Limpiar el input
         console.log("onSubmit");
     };
 
@@ -98,7 +125,7 @@ const List = () => {
 
     async function creartodoList(item) {
         try {
-            const res = await fetch('https://playground.4geeks.com/todo/todos', {  // URL correcta para tareas
+            const res = await fetch('https://playground.4geeks.com/todo/todos/AlexTodoList', {  // URL correcta para tareas
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -122,13 +149,7 @@ const List = () => {
 
 
 
-    // Eliminar todas las tareas de la lista local
-    async function limpiarTodoList() {
-        for (const item of todoList) {
-            await eliminarTareaAPI(item.id);  // Eliminar tarea en la API
-        }
-        setTodoList([]);  // Limpiar la lista local
-    }
+
 
 
 
@@ -180,7 +201,7 @@ const List = () => {
                     <div className="container-flex border-bottom p-1">
                         <input
                             onChange={(e) =>
-                                setInputValue(e.target.value)} 
+                                setInputValue(e.target.value)}
                             value={inputValue}
                             required
                             type="text"
@@ -193,9 +214,9 @@ const List = () => {
                                     const newValue = inputValue.trim()
 
                                     if (inputValue && newValue != "") {
-                                         creartodoList(inputValue) 
+                                        creartodoList(inputValue)
 
-                                    
+
                                     } else {
                                         alert("¡Esta tarea ya existe!");
                                     }
@@ -236,7 +257,7 @@ const List = () => {
                 </ul>
                 <div className="pt-3 ps-2 border-top d-flex justify-content-around">
                     Tareas pendientes: {numTareas}
-                    <button className="btn" onClick={limpiarTodoList}>Limpiar</button>
+                    <button className="btn" onClick={eliminarTodas}>Limpiar</button>
                 </div>
             </div>
             <div style={{ height: "3px", borderRadius: "3px" }} className="lavenderBlush border mx-1"></div>
