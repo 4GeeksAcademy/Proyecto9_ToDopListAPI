@@ -113,7 +113,7 @@ const List = () => {
     // FUNCION ASINCRONA CREAR NUEVA TAREA 
     async function onSubmit(e) {
         e.preventDefault();
-        await creartodoList(inputValue); // Crea nueva tarea
+        // await creartodoList(inputValue); // Crea nueva tarea
         setInputValue(''); // Limpiar el input
         console.log("onSubmit");
     };
@@ -140,6 +140,7 @@ const List = () => {
             const nuevaLista = [...todoList, { id: data.id, label: item }]; // Añade la nueva tarea a la lista
             setTodoList(nuevaLista);  // Actualiza el estado con la nueva lista
             console.log(data);
+            fetchData()
         } catch (error) {
             console.log('Error al crear TodoList', error);
         }
